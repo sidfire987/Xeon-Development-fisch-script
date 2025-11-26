@@ -1,0 +1,1991 @@
+local repo = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+
+local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+
+local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
+
+local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
+
+-- Cria a janela principal
+
+local Window = Library:CreateWindow({
+
+    Title = "Xeon DEVELOPMENT",
+
+    Footer = "v2.59.04",
+
+    Icon = 95816097006870,
+
+    NotifySide = "Right",
+
+    ShowCustomCursor = true,
+
+    Theme = "Pink",
+
+})
+
+-- Aba única Main
+
+local MainTab = Window:AddTab("Main", "house")
+
+-- Criação de GroupBoxes no estilo do script Blox Fruits
+
+local GroupBoxes = {}
+
+local groupboxNames = { "Fishing Features", "Player Moviment", "TP Features", "Quality Of Life" }
+
+for i, name in ipairs(groupboxNames) do
+
+    if i % 2 == 1 then
+
+        GroupBoxes[name] = MainTab:AddLeftGroupbox(name)
+
+    else
+
+        GroupBoxes[name] = MainTab:AddRightGroupbox(name)
+
+    end
+
+end
+
+local FishingGroup = GroupBoxes["Fishing Features"]
+
+local PlayerMovimentGroup = GroupBoxes["Player Moviment"]
+
+local TPGroup = GroupBoxes["TP Features"]
+
+local QoLGroup = GroupBoxes["Quality Of Life"]
+
+--=============================
+
+-- SPEED
+
+--=============================
+
+local speedEnabled = false
+
+local speedPower = 75
+
+local speedMethod = "Humanoid"
+
+-- Toggle Speed9
+
+PlayerMovimentGroup:AddToggle("SpeedToggle", {
+
+    Text = "SPEED TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates speed loop",
+
+    Callback = function(state)
+
+        speedEnabled = state
+
+    end
+
+})
+
+-- Speed Power Slider
+
+PlayerMovimentGroup:AddSlider("SpeedPowerSlider", {
+
+    Text = "SPEED POWER",
+
+    Default = speedPower,
+
+    Min = 16,
+
+    Max = 500,
+
+    Tooltip = "Set speed power",
+
+    Callback = function(value)
+
+        speedPower = value
+
+    end
+
+})
+
+-- Speed Method Dropdown
+
+PlayerMovimentGroup:AddDropdown("SpeedMethodDropdown", {
+
+    Text = "SPEED METHOD",
+
+    Values = {"Humanoid", "CFrame Teleport", "Velocity"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Tooltip = "Choose speed method",
+
+    Callback = function(value)
+
+        speedMethod = value
+
+    end
+
+})
+
+-- Loop que aplica o Speed
+
+spawn(function()
+
+    while task.wait(0.1) do
+
+        if speedEnabled then
+
+            local char = game.Players.LocalPlayer.Character
+
+            if char and char:FindFirstChildOfClass("Humanoid") then
+
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+                if speedMethod == "Humanoid" then
+
+                    humanoid.WalkSpeed = speedPower
+
+                elseif speedMethod == "CFrame Teleport" then
+
+                    local root = char:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+
+                        root.CFrame += root.CFrame.LookVector * (speedPower * 0.1)
+
+                    end
+
+                elseif speedMethod == "Velocity" then
+
+                    local root = char:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+
+                        root.Velocity = root.CFrame.LookVector * speedPower
+
+                    end
+
+                end
+
+            end
+
+        end
+
+    end
+
+end)
+
+--=============================
+
+-- JUMP POWER
+
+--=============================
+
+local jumpEnabled = false
+
+local jumpPower = 100
+
+local jumpCount = 1
+
+local jumpMethod = "Humanoid"
+
+-- Toggle JumpPower
+
+PlayerMovimentGroup:AddToggle("JumpPowerToggle", {
+
+    Text = "JUMP POWER TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates jump power loop",
+
+    Callback = function(state)
+
+        jumpEnabled = state
+
+    end
+
+})
+
+-- Jump Power Slider
+
+PlayerMovimentGroup:AddSlider("JumpPowerSlider", {
+
+    Text = "JUMP POWER",
+
+    Default = jumpPower,
+
+    Min = 50,
+
+    Max = 500,
+
+    Tooltip = "Set jump power",
+
+    Callback = function(value)
+
+        jumpPower = value
+
+    end
+
+})
+
+-- Jump Count Input
+
+PlayerMovimentGroup:AddInput("JumpCountInput", {
+
+    Text = "JUMP COUNT",
+
+    Default = tostring(jumpCount),
+
+    Numeric = true,
+
+    Finished = true,
+
+    Tooltip = "Set number of jumps",
+
+    Callback = function(value)
+
+        jumpCount = tonumber(value) or 1
+
+    end
+
+})
+
+-- Jump Method Dropdown
+
+PlayerMovimentGroup:AddDropdown("JumpPowerMethodDropdown", {
+
+    Text = "JUMP POWER METHOD",
+
+    Values = {"Humanoid", "CFrame", "Velocity"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Tooltip = "Choose jump method",
+
+    Callback = function(value)
+
+        jumpMethod = value
+
+    end
+
+})
+
+-- Loop que aplica JumpPower
+
+spawn(function()
+
+    while task.wait(0.1) do
+
+        if jumpEnabled then
+
+            local char = game.Players.LocalPlayer.Character
+
+            if char and char:FindFirstChildOfClass("Humanoid") then
+
+                local humanoid = char:FindFirstChildOfClass("Humanoid")
+
+                for i = 1, jumpCount do
+
+                    if jumpMethod == "Humanoid" then
+
+                        humanoid.JumpPower = jumpPower
+
+                        humanoid:ChangeState("Jumping")
+
+                    elseif jumpMethod == "CFrame" then
+
+                        local root = char:FindFirstChild("HumanoidRootPart")
+
+                        if root then
+
+                            root.CFrame += Vector3.new(0, jumpPower * 0.1, 0)
+
+                        end
+
+                    elseif jumpMethod == "Velocity" then
+
+                        local root = char:FindFirstChild("HumanoidRootPart")
+
+                        if root then
+
+                            root.Velocity = Vector3.new(0, jumpPower, 0)
+
+                        end
+
+                    end
+
+                    task.wait(0.05)
+
+                end
+
+            end
+
+        end
+
+    end
+
+end)
+
+--=============================
+
+-- NOCLIP
+
+--=============================
+
+local noclipEnabled = false
+
+local noclipMethod = "Normal"
+
+-- Toggle Noclip
+
+PlayerMovimentGroup:AddToggle("NoclipToggle", {
+
+    Text = "NOCLIP TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates noclip",
+
+    Callback = function(state)
+
+        noclipEnabled = state
+
+    end
+
+})
+
+-- Noclip Method Dropdown
+
+PlayerMovimentGroup:AddDropdown("NoclipMethodDropdown", {
+
+    Text = "NOCLIP METHOD",
+
+    Values = {"Normal", "Noclip TP"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Tooltip = "Choose noclip method",
+
+    Callback = function(value)
+
+        noclipMethod = value
+
+    end
+
+})
+
+-- Loop Noclip
+
+spawn(function()
+
+    while task.wait(0.1) do
+
+        if noclipEnabled then
+
+            local char = game.Players.LocalPlayer.Character
+
+            if char then
+
+                if noclipMethod == "Normal" then
+
+                    for _, part in pairs(char:GetDescendants()) do
+
+                        if part:IsA("BasePart") then
+
+                            part.CanCollide = false
+
+                        end
+
+                    end
+
+                elseif noclipMethod == "Noclip TP" then
+
+                    local root = char:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+
+                        -- Teleporta a cada 0.1s para a própria posição para evitar colisão
+
+                        root.CFrame = root.CFrame
+
+                    end
+
+                end
+
+            end
+
+        end
+
+    end
+
+end)
+
+--=============================
+
+-- INF JUMP
+
+--=============================
+
+local infJumpEnabled = false
+
+local infJumpMethod = "Normal"
+
+-- Toggle Inf Jump
+
+PlayerMovimentGroup:AddToggle("InfJumpToggle", {
+
+    Text = "INF JUMP TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates infinite jump",
+
+    Callback = function(state)
+
+        infJumpEnabled = state
+
+    end
+
+})
+
+-- Inf Jump Method Dropdown
+
+PlayerMovimentGroup:AddDropdown("InfJumpMethodDropdown", {
+
+    Text = "INF JUMP METHOD",
+
+    Values = {"Normal", "Platform"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Tooltip = "Choose inf jump method",
+
+    Callback = function(value)
+
+        infJumpMethod = value
+
+    end
+
+})
+
+-- Loop Inf Jump
+
+local UserInputService = game:GetService("UserInputService")
+
+local infJumpConnection
+
+spawn(function()
+
+    while task.wait(0.1) do
+
+        if infJumpEnabled and not infJumpConnection then
+
+            infJumpConnection = UserInputService.JumpRequest:Connect(function()
+
+                local char = game.Players.LocalPlayer.Character
+
+                if char and char:FindFirstChildOfClass("Humanoid") then
+
+                    if infJumpMethod == "Normal" then
+
+                        char:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+
+                    elseif infJumpMethod == "Platform" then
+
+                        local root = char:FindFirstChild("HumanoidRootPart")
+
+                        if root then
+
+                            root.CFrame += Vector3.new(0, 50, 0)
+
+                        end
+
+                    end
+
+                end
+
+            end)
+
+        elseif not infJumpEnabled and infJumpConnection then
+
+            infJumpConnection:Disconnect()
+
+            infJumpConnection = nil
+
+        end
+
+    end
+
+end)
+
+--=============================
+
+-- GRAVITY
+
+--=============================
+
+local gravityEnabled = false
+
+local gravityPower = workspace.Gravity
+
+local gravityKeybind = Enum.KeyCode.G
+
+-- Toggle Gravity
+
+PlayerMovimentGroup:AddToggle("GravityToggle", {
+
+    Text = "GRAVITY TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates gravity",
+
+    Callback = function(state)
+
+        gravityEnabled = state
+
+        workspace.Gravity = gravityEnabled and gravityPower or 196.2
+
+    end
+
+})
+
+-- Gravity Power Slider
+
+PlayerMovimentGroup:AddSlider("GravityPowerSlider", {
+
+    Text = "GRAVITY POWER",
+
+    Default = gravityPower,
+
+    Min = -200,
+
+    Max = 1000,
+
+    Tooltip = "Set gravity power",
+
+    Callback = function(value)
+
+        gravityPower = value
+
+        if gravityEnabled then
+
+            workspace.Gravity = gravityPower
+
+        end
+
+    end
+
+})
+
+--=============================
+
+-- FLY
+
+--=============================
+
+local flyEnabled = false
+
+local flySpeed = 50
+
+local flyMethod = "Normal"
+
+local flyConnection
+
+-- Toggle Fly
+
+PlayerMovimentGroup:AddToggle("FlyToggle", {
+
+    Text = "FLY TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Activates/Deactivates fly",
+
+    Callback = function(state)
+
+        flyEnabled = state
+
+        local player = game.Players.LocalPlayer
+
+        local uis = game:GetService("UserInputService")
+
+        if flyConnection then flyConnection:Disconnect() flyConnection = nil end
+
+        if flyEnabled then
+
+            flyConnection = game:GetService("RunService").Heartbeat:Connect(function()
+
+                local char = player.Character
+
+                if char and char:FindFirstChild("HumanoidRootPart") then
+
+                    local root = char.HumanoidRootPart
+
+                    local cam = workspace.CurrentCamera
+
+                    local dir = Vector3.zero
+
+                    if uis:IsKeyDown(Enum.KeyCode.W) then dir += cam.CFrame.LookVector end
+
+                    if uis:IsKeyDown(Enum.KeyCode.S) then dir -= cam.CFrame.LookVector end
+
+                    if uis:IsKeyDown(Enum.KeyCode.A) then dir -= cam.CFrame.RightVector end
+
+                    if uis:IsKeyDown(Enum.KeyCode.D) then dir += cam.CFrame.RightVector end
+
+                    if uis:IsKeyDown(Enum.KeyCode.Space) then dir += cam.CFrame.UpVector end
+
+                    if uis:IsKeyDown(Enum.KeyCode.LeftShift) then dir -= cam.CFrame.UpVector end
+
+                    if flyMethod == "Normal" or flyMethod == "Float Fly" then
+
+                        root.Velocity = dir.Magnitude > 0 and dir.Unit * flySpeed or Vector3.zero
+
+                    elseif flyMethod == "Platform" then
+
+                        local floorY = root.Position.Y - 10
+
+                        root.CFrame = CFrame.new(root.Position.X, floorY + 10, root.Position.Z)
+
+                        root.Velocity = dir.Magnitude > 0 and dir.Unit * flySpeed or Vector3.zero
+
+                    end
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+-- Fly Speed Slider
+
+PlayerMovimentGroup:AddSlider("FlySpeedSlider", {
+
+    Text = "FLY SPEED",
+
+    Default = flySpeed,
+
+    Min = 10,
+
+    Max = 200,
+
+    Tooltip = "Adjust fly speed",
+
+    Callback = function(value)
+
+        flySpeed = value
+
+    end
+
+})
+
+-- Fly Method Dropdown
+
+PlayerMovimentGroup:AddDropdown("FlyMethodDropdown", {
+
+    Text = "FLY METHOD",
+
+    Values = {"Normal", "Float Fly", "Platform"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Tooltip = "Select fly method",
+
+    Callback = function(value)
+
+        flyMethod = value
+
+    end
+
+})
+
+--=============================
+
+-- PLATFORM
+
+--=============================
+
+local platformEnabled = false
+
+local platformUp = false
+
+local platformSize = Vector2.new(10,10)
+
+local platformUpSpeed = 5
+
+local platformKeybind = Enum.KeyCode.P
+
+local platformPart
+
+-- Platform Toggle
+
+PlayerMovimentGroup:AddToggle("PlatformToggle", {
+
+    Text = "PLATFORM TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Creates a platform under player",
+
+    Callback = function(state)
+
+        platformEnabled = state
+
+        local player = game.Players.LocalPlayer
+
+        local char = player.Character
+
+        if platformEnabled then
+
+            if char and char:FindFirstChild("HumanoidRootPart") then
+
+                if not platformPart then
+
+                    platformPart = Instance.new("Part")
+
+                    platformPart.Size = Vector3.new(platformSize.X,1,platformSize.Y)
+
+                    platformPart.Anchored = true
+
+                    platformPart.CanCollide = true
+
+                    platformPart.Material = Enum.Material.Neon
+
+                    platformPart.Color = Color3.fromRGB(0,255,0)
+
+                    platformPart.CFrame = char.HumanoidRootPart.CFrame - Vector3.new(0,char.HumanoidRootPart.Size.Y/2 + 1,0)
+
+                    platformPart.Parent = workspace
+
+                end
+
+            end
+
+        else
+
+            if platformPart then
+
+                platformPart:Destroy()
+
+                platformPart = nil
+
+            end
+
+        end
+
+    end
+
+})
+
+-- Platform Up Toggle
+
+PlayerMovimentGroup:AddToggle("PlatformUpToggle", {
+
+    Text = "PLATFORM UP TOGGLE",
+
+    Default = false,
+
+    Tooltip = "Enable platform to move up",
+
+    Callback = function(state)
+
+        platformUp = state
+
+    end
+
+})
+
+-- Platform Size Slider
+
+PlayerMovimentGroup:AddSlider("PlatformSizeSlider", {
+
+    Text = "PLATFORM SIZE",
+
+    Default = 10,
+
+    Min = 1,
+
+    Max = 50,
+
+    Tooltip = "Set platform width/length",
+
+    Callback = function(value)
+
+        platformSize = Vector2.new(value,value)
+
+        if platformPart then
+
+            platformPart.Size = Vector3.new(platformSize.X,1,platformSize.Y)
+
+        end
+
+    end
+
+})
+
+-- Platform Up Speed Slider
+
+PlayerMovimentGroup:AddSlider("PlatformUpSpeedSlider", {
+
+    Text = "PLATFORM UP SPEED",
+
+    Default = platformUpSpeed,
+
+    Min = 1,
+
+    Max = 50,
+
+    Tooltip = "Set platform rising speed",
+
+    Callback = function(value)
+
+        platformUpSpeed = value
+
+    end
+
+})
+
+-- Platform Loop
+
+spawn(function()
+
+    while task.wait(0.1) do
+
+        if platformEnabled and platformPart then
+
+            local player = game.Players.LocalPlayer
+
+            local char = player.Character
+
+            if char and char:FindFirstChild("HumanoidRootPart") then
+
+                local root = char.HumanoidRootPart
+
+                platformPart.CFrame = CFrame.new(root.Position.X, root.Position.Y - 3, root.Position.Z)
+
+                if platformUp then
+
+                    platformPart.CFrame += Vector3.new(0,platformUpSpeed * 0.1,0)
+
+                end
+
+            end
+
+        end
+
+    end
+
+end)
+
+-- Services
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+-- RemoteEvents
+
+local reelfinished = ReplicatedStorage:WaitForChild("events"):WaitForChild("reelfinished")
+
+-- Args
+
+local reelArgs = {100, true}
+
+local castArgs = {100, 1}
+
+-- Variáveis de controle
+
+local AutoReelEnabled = false
+
+local AutoCastEnabled = false
+
+local AutoReelLoop
+
+local AutoCastLoop
+
+-- REEL FISH (uma vez)
+
+FishingGroup:AddButton("REELFISH", {
+
+    Text = "REEL FISH",
+
+    Tooltip = "Fire the Reel Remote once",
+
+    Func = function()
+
+        pcall(function()
+
+            reelfinished:FireServer(unpack(reelArgs))
+
+        end)
+
+    end
+
+})
+
+-- AUTO REEL (loop)
+
+FishingGroup:AddToggle("AutoReelToggle", {
+
+    Text = "AUTO REEL",
+
+    Default = false,
+
+    Tooltip = "Automatically fire the Reel Remote",
+
+    Callback = function(state)
+
+        AutoReelEnabled = state
+
+        if AutoReelLoop then
+
+            task.cancel(AutoReelLoop)
+
+            AutoReelLoop = nil
+
+        end
+
+        if AutoReelEnabled then
+
+            AutoReelLoop = task.spawn(function()
+
+                while AutoReelEnabled do
+
+                    pcall(function()
+
+                        reelfinished:FireServer(unpack(reelArgs))
+
+                    end)
+
+                    task.wait(1)
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+-- CAST ROD (uma vez)
+
+FishingGroup:AddButton("CASTROD", {
+
+    Text = "CAST ROD",
+
+    Tooltip = "Fire castAsync on your Rod once",
+
+    Func = function()
+
+        local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+        local rod = nil
+
+        for _, tool in pairs(char:GetChildren()) do
+
+            if tool:IsA("Tool") and string.find(tool.Name:lower(), "rod") then
+
+                rod = tool
+
+                break
+
+            end
+
+        end
+
+        if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("castAsync") then
+
+            pcall(function()
+
+                rod.events.castAsync:InvokeServer(unpack(castArgs))
+
+            end)
+
+        end
+
+    end
+
+})
+
+-- AUTO CAST ROD (loop)
+
+FishingGroup:AddToggle("AutoCastToggle", {
+
+    Text = "AUTO CAST ROD",
+
+    Default = false,
+
+    Tooltip = "Automatically cast your Rod",
+
+    Callback = function(state)
+
+        AutoCastEnabled = state
+
+        if AutoCastLoop then
+
+            task.cancel(AutoCastLoop)
+
+            AutoCastLoop = nil
+
+        end
+
+        if AutoCastEnabled then
+
+            AutoCastLoop = task.spawn(function()
+
+                while AutoCastEnabled do
+
+                    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+                    local rod = nil
+
+                    for _, tool in pairs(char:GetChildren()) do
+
+                        if tool:IsA("Tool") and string.find(tool.Name:lower(), "rod") then
+
+                            rod = tool
+
+                            break
+
+                        end
+
+                    end
+
+                    if rod and rod:FindFirstChild("events") and rod.events:FindFirstChild("castAsync") then
+
+                        pcall(function()
+
+                            rod.events.castAsync:InvokeServer(unpack(castArgs))
+
+                        end)
+
+                    end
+
+                    task.wait(0.1)
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+
+local Workspace = game:GetService("Workspace")
+
+---------------------------------------------------
+
+-- 📋 COPY COORDINATES
+
+---------------------------------------------------
+
+TPGroup:AddButton("COPYCORDINATES", {
+
+    Text = "Copy Coordinates",
+
+    Tooltip = "Copies your current XYZ position",
+
+    Func = function()
+
+        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if root then
+
+            setclipboard(string.format("%d, %d, %d", root.Position.X, root.Position.Y, root.Position.Z))
+
+            print("📋 Coordinates copied:", root.Position)
+
+        end
+
+    end
+
+})
+
+---------------------------------------------------
+
+-- 📍 TELEPORT TO COORDINATES
+
+---------------------------------------------------
+
+TPGroup:AddInput("TeleportToCoords", {
+
+    Text = "Teleport to Coordinates",
+
+    Default = "",
+
+    Tooltip = "Enter coordinates like: 100, 50, -200 then press Enter",
+
+    Placeholder = "x, y, z",
+
+    Callback = function(value)
+
+        local x, y, z = value:match("(-?%d+),%s*(-?%d+),%s*(-?%d+)")
+
+        if x and y and z then
+
+            local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if root then
+
+                root.CFrame = CFrame.new(tonumber(x), tonumber(y), tonumber(z))
+
+                print(string.format("🧭 Teleported to: (%d, %d, %d)", x, y, z))
+
+            end
+
+        else
+
+            warn("⚠️ Invalid format. Use: 100, 50, -200")
+
+        end
+
+    end
+
+})
+
+---------------------------------------------------
+
+-- 🧍 DIRECTIONAL TELEPORT
+
+---------------------------------------------------
+
+local DirectionStuds = 10
+
+local Direction = "Forward"
+
+TPGroup:AddInput("TeleportStudsInput", {
+
+    Text = "Teleport Studs",
+
+    Default = "10",
+
+    Tooltip = "How many studs to teleport",
+
+    Placeholder = "Studs",
+
+    Callback = function(value)
+
+        DirectionStuds = tonumber(value) or 10
+
+    end
+
+})
+
+TPGroup:AddDropdown("TeleportDirection", {
+
+    Values = {"Forward", "Backward", "Left", "Right", "Up", "Down"},
+
+    Default = 1,
+
+    Multi = false,
+
+    Text = "Teleport Direction",
+
+    Tooltip = "Choose a direction to teleport",
+
+    Callback = function(value)
+
+        Direction = value
+
+    end
+
+})
+
+TPGroup:AddButton("TPNOW", {
+
+    Text = "Teleport Now",
+
+    Tooltip = "Teleport in chosen direction by selected studs",
+
+    Func = function()
+
+        local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+        if root then
+
+            local move = Vector3.new(0, 0, 0)
+
+            if Direction == "Forward" then move = root.CFrame.LookVector * DirectionStuds end
+
+            if Direction == "Backward" then move = -root.CFrame.LookVector * DirectionStuds end
+
+            if Direction == "Right" then move = root.CFrame.RightVector * DirectionStuds end
+
+            if Direction == "Left" then move = -root.CFrame.RightVector * DirectionStuds end
+
+            if Direction == "Up" then move = Vector3.new(0, DirectionStuds, 0) end
+
+            if Direction == "Down" then move = Vector3.new(0, -DirectionStuds, 0) end
+
+            root.CFrame = root.CFrame + move
+
+            print("🌀 Teleported", DirectionStuds, "studs", Direction)
+
+        end
+
+    end
+
+})
+
+QoLGroup:AddToggle("InfiniteOxygenToggle", {
+
+    Text = "Infinite Oxygen / Heat",
+
+    Tooltip = "Disables all scripts inside your Resources folder (Oxygen/Heat)",
+
+    Callback = function(state)
+
+        local folderPath = Workspace:FindFirstChild(LocalPlayer.Name)
+
+        if folderPath then
+
+            local resources = folderPath:FindFirstChild("Resources")
+
+            if resources then
+
+                for _, descendant in ipairs(resources:GetDescendants()) do
+
+                    if descendant:IsA("Script") or descendant:IsA("LocalScript") then
+
+                        descendant.Disabled = state
+
+                    end
+
+                end
+
+                print("✅ Resources scripts have been " .. (state and "disabled" or "enabled") .. ".")
+
+            else
+
+                warn("⚠️ Folder 'Resources' not found inside " .. LocalPlayer.Name)
+
+            end
+
+        else
+
+            warn("⚠️ Player folder not found in workspace.")
+
+        end
+
+    end
+
+})
+
+---------------------------------------------------
+
+-- 🌊 AUTO OCEAN PLATFORM ABOVE WATER
+
+---------------------------------------------------
+
+local AutoPlatformEnabled = false
+
+local PlatformPart
+
+local PlatformSize = 10
+
+local HeightAboveWater = 3 -- altura acima da água
+
+QoLGroup:AddToggle("AutoOceanPlatformToggle", {
+
+    Text = "Auto Ocean Platform",
+
+    Default = false,
+
+    Tooltip = "Creates a green platform 5 studs above ocean",
+
+    Callback = function(state)
+
+        AutoPlatformEnabled = state
+
+        if not state and PlatformPart then
+
+            PlatformPart:Destroy()
+
+            PlatformPart = nil
+
+        end
+
+        if state then
+
+            task.spawn(function()
+
+                while AutoPlatformEnabled do
+
+                    local root = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+                    if root then
+
+                        local rayParams = RaycastParams.new()
+
+                        rayParams.FilterDescendantsInstances = {LocalPlayer.Character}
+
+                        rayParams.FilterType = Enum.RaycastFilterType.Exclude
+
+                        -- Raycast para baixo
+
+                        local result = Workspace:Raycast(root.Position, Vector3.new(0, -50, 0), rayParams)
+
+                        if result and result.Instance then
+
+                            local instance = result.Instance
+
+                            local isOcean = false
+
+                            -- Detecta Terrain Water
+
+                            if instance:IsA("Terrain") and instance.Material == Enum.Material.Water then
+
+                                isOcean = true
+
+                            end
+
+                            -- Detecta partes nomeadas 'Ocean'
+
+                            if instance.Name:lower():find("ocean") then
+
+                                isOcean = true
+
+                            end
+
+                            if isOcean then
+
+                                if not PlatformPart then
+
+                                    PlatformPart = Instance.new("Part")
+
+                                    PlatformPart.Anchored = true
+
+                                    PlatformPart.Color = Color3.fromRGB(0, 255, 0)
+
+                                    PlatformPart.Material = Enum.Material.SmoothPlastic
+
+                                    PlatformPart.CanCollide = true
+
+                                    PlatformPart.Name = "OceanPlatform"
+
+                                    PlatformPart.Size = Vector3.new(PlatformSize, 1, PlatformSize)
+
+                                    PlatformPart.Parent = Workspace
+
+                                end
+
+                                -- Posiciona a plataforma 5 studs acima da água
+
+                                PlatformPart.Position = result.Position + Vector3.new(0, HeightAboveWater, 0)
+
+                            elseif PlatformPart then
+
+                                PlatformPart:Destroy()
+
+                                PlatformPart = nil
+
+                            end
+
+                        elseif PlatformPart then
+
+                            PlatformPart:Destroy()
+
+                            PlatformPart = nil
+
+                        end
+
+                    end
+
+                    task.wait(0.05) -- atualiza rapidamente
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+QoLGroup:AddSlider("PlatformSizeSlider", {
+
+    Text = "Platform Size",
+
+    Default = 10,
+
+    Min = 5,
+
+    Max = 50,
+
+    Rounding = 0,
+
+    Tooltip = "Adjusts the green platform width",
+
+    Callback = function(value)
+
+        PlatformSize = value
+
+        if PlatformPart then
+
+            PlatformPart.Size = Vector3.new(value, 1, value)
+
+        end
+
+    end
+
+})
+
+local AutoReelEnabled = false
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local Players = game:GetService("Players")
+
+local Camera = workspace.CurrentCamera
+
+local LocalPlayer = Players.LocalPlayer
+
+-- Function to get the rod you are currently holding (Equipped or in Backpack)
+
+local function GetCurrentRod()
+
+    if LocalPlayer.Character then
+
+        for _, tool in pairs(LocalPlayer.Character:GetChildren()) do
+
+            if tool:IsA("Tool") then
+
+                return tool
+
+            end
+
+        end
+
+    end
+
+    for _, tool in pairs(LocalPlayer.Backpack:GetChildren()) do
+
+        if tool:IsA("Tool") then
+
+            return tool
+
+        end
+
+    end
+
+    return nil
+
+end
+
+-- Function that holds a click at the center of the screen for 0.78 seconds
+
+local function HoldClickCenter()
+
+    local x, y = Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2
+
+    VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 0)
+
+    task.wait(0.78)
+
+    VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 0)
+
+end
+
+-- Add Toggle to Obsidian UI
+
+FishingGroup:AddToggle("AutoReelToggle", {
+
+    Text = "AUTO CAST V2.0",
+
+    Default = false,
+
+    Tooltip = "Automatically clicks the rod when casted is false",
+
+    Callback = function(state)
+
+        AutoReelEnabled = state
+
+        if state then
+
+            task.spawn(function()
+
+                while AutoReelEnabled do
+
+                    local Rod = GetCurrentRod()
+
+                    if Rod and Rod:FindFirstChild("values") then
+
+                        local Values = Rod.values
+
+                        if Values:FindFirstChild("casted") and not Values.casted.Value then
+
+                            HoldClickCenter()
+
+                        end
+
+                    end
+
+                    task.wait(5)
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local Players = game:GetService("Players")
+
+local Camera = workspace.CurrentCamera
+
+local LocalPlayer = Players.LocalPlayer
+
+local AutoOpenEnabled = false
+
+-- Function to click center
+
+local function ClickCenter()
+
+    local x, y = Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2
+
+    VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 0)
+
+    VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 0)
+
+end
+
+-- Add toggle to Obsidian UI
+
+QoLGroup:AddToggle("AutoOpenToggle", {
+
+    Text = "Auto Open Baits/Crates",
+
+    Default = false,
+
+    Tooltip = "Automatically opens Baits or Crates by clicking the center",
+
+    Callback = function(state)
+
+        AutoOpenEnabled = state
+
+        if state then
+
+            task.spawn(function()
+
+                while AutoOpenEnabled do
+
+                    ClickCenter()
+
+                    task.wait(0.05) -- speed of click
+
+                end
+
+            end)
+
+        end
+
+    end
+
+})
+
+local Players = game:GetService("Players")
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local player = Players.LocalPlayer
+
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Offset values (click position adjustment)
+
+local OffsetX = 15  -- right
+
+local OffsetY = 35  -- down
+
+-- Toggle control
+
+local AutoShakeEnabled = false
+
+-- Function that performs the shaking click
+
+local function AutoShake()
+
+	while AutoShakeEnabled do		task.wait(0.1)
+
+		local shakeUI = playerGui:FindFirstChild("shakeui")
+
+		if shakeUI and shakeUI:FindFirstChild("safezone") then
+
+			local button = shakeUI.safezone:FindFirstChild("button")
+
+			if button then
+
+				local title = button:FindFirstChild("title")
+
+				if title and title:IsA("TextLabel") and title.Visible then
+
+					local absPos = title.AbsolutePosition
+
+					local absSize = title.AbsoluteSize
+
+					local clickX = absPos.X + absSize.X / 2 + OffsetX
+
+					local clickY = absPos.Y + absSize.Y / 2 + OffsetY
+
+					pcall(function()
+
+						VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, true, game, 0)
+
+						task.wait(0.02)
+
+						VirtualInputManager:SendMouseButtonEvent(clickX, clickY, 0, false, game, 0)
+
+					end)
+
+				end
+
+			end
+
+		end
+
+	end
+
+end
+
+-- Add toggle to the UI
+
+FishingGroup:AddToggle("AutoShakeToggle", {
+
+	Text = "Auto Shake",
+
+	Default = false,
+
+	Tooltip = "Automatically clicks during shake events while fishing.",
+
+	Callback = function(state)
+
+		AutoShakeEnabled = state
+
+		if state then
+
+			task.spawn(AutoShake)
+
+		end
+
+	end
+
+})
+
+-- 🌍 TELEPORT SYSTEM (Full Updated + Alphabetically Ordered)
+
+-- GroupBox: TP
+
+local TeleportLocations = {
+
+    ["None"] = nil,
+
+    -- ⚓️ Existing (previous)
+
+    ["Abyssal Zenith - MAIN"] = Vector3.new(-13486.57, -11048.69, 147.35),
+
+    ["Abyssal Zenith - ROD"] = Vector3.new(-13644.29, -11035.21, 352.57),
+
+    ["Acient Island - MAIN"] = Vector3.new(6068.83, 195.16, 287.13),
+
+    ["Acient Island - POUND 1"] = Vector3.new(5999, 194, 382),
+
+    ["Acient Island - POUND 2"] = Vector3.new(6061, 401, 656),
+
+    ["Acient Island - SHIP"] = Vector3.new(5882, 143, 23),
+
+    ["Acient Island - WATERFALL"] = Vector3.new(5808, 148, 414),
+
+    ["Altar - MAIN"] = Vector3.new(22.74, 159.01, -1037.92),
+
+    ["Atlantean Storm - MAIN"] = Vector3.new(-3593, 153, 512),
+
+    ["Atlantis - MAIN"] = Vector3.new(-4331, -603, 1822),
+
+    ["Atlantis - SELL"] = Vector3.new(-4454, -605, 1851),
+
+    ["Blue Moon - MAIN"] = Vector3.new(2695, 131, 2586),
+
+    ["Brine Pool - AURORA TOTEM"] = Vector3.new(-1810, -136, -3280),
+
+    ["Brine Pool - MAIN"] = Vector3.new(-1795, -142, -3397),
+
+    ["Calm Zone - MAIN 1"] = Vector3.new(-4256.21, -11200.71, 1783.91),
+
+    ["Calm Zone - MAIN 2"] = Vector3.new(-4362.04, -11175.49, 3708.89),
+
+    ["Calm Zone - SCYLLA PUZZLE"] = Vector3.new(-4300.29, -11175.64, 4006.34),
+
+    ["Calm Zone - SHIP"] = Vector3.new(-4209.48, -11200.63, 1420.67),
+
+    ["Carrot Island - MAIN"] = Vector3.new(3725.78589, -1130.48267, -1069.81592),
+
+    ["Castaway - CAVE"] = Vector3.new(462, 203, -1959),
+
+    ["Castaway - MAIN"] = Vector3.new(397, 199, -1802),
+
+    ["Castaway - POUND"] = Vector3.new(624, 159, -1871),
+
+    ["Castaway - RED MARLIN"] = Vector3.new(528, 309, -2032),
+
+    ["Castaway - SHIP"] = Vector3.new(690, 133, -1699),
+
+    ["Challenger's Deep - BLACK MARKET"] = Vector3.new(-978, -244, -2700),
+
+    ["Challenger's Deep - MAIN"] = Vector3.new(-1658, -214, -2843),
+
+    ["Crimson Cavern - MAIN"] = Vector3.new(-1073, -353, -4873),
+
+    ["Forsaken Shore - MAIN"] = Vector3.new(-2494.16, 133.25, 1558.86),
+
+    ["Grand Reef - MAIN"] = Vector3.new(-3576.43, 151.08, 523.13),
+
+    ["Keepers Altar - ALTAR"] = Vector3.new(1310.73328, -808.551941, -103.468826),
+
+    ["Moosewood - MAIN"] = Vector3.new(403.19, 134.00, 236.28),
+
+    ["Moosewood - SELL"] = Vector3.new(464.61, 150.63, 231.13),
+
+    ["Mushgrove Swamp - MAIN"] = Vector3.new(2449.24, 130.86, -667.88),
+
+    ["Northern Summit - CAVE"] = Vector3.new(20049.27, 512.40, 5428.28),
+
+    ["Northern Summit - GEM 1"] = Vector3.new(20130.38, 208.37, 5429.69),
+
+    ["Northern Summit - MAIN"] = Vector3.new(19550.66, 132.67, 5300.76),
+
+    ["Overgrowth Caves - CAVE"] = Vector3.new(20049.27, 512.40, 5428.28),
+
+    ["Overgrowth Caves - GEM 2"] = Vector3.new(19881.36, 448.09, 5559.87),
+
+    ["Overgrowth Caves - MAN"] = Vector3.new(19835.89, 439.61, 5615.26),
+
+    ["Roslit Bay - MAIN"] = Vector3.new(-1465.14, 133.22, 679.52),
+
+    ["Roslit Bay - VOLCANO"] = Vector3.new(-1958.76, 192.48, 265.41),
+
+    ["SnowCap - MAIN"] = Vector3.new(2684.61, 152.58, 2392.01),
+
+    ["SunStone - CAVE"] = Vector3.new(-1146.59, 134.50, -1065.05),
+
+    ["SunStone - MAIN"] = Vector3.new(-928.98, 131.54, -1114.39),
+
+    ["SunStone - MERLIN"] = Vector3.new(-932.16, 223.78, -988.99),
+
+    ["Veil of the Forsaken - DOOR 1"] = Vector3.new(-4354.93, -11186.15, 7407.52),
+
+    ["Veil of the Forsaken - DOOR 2"] = Vector3.new(-4353.75, -11186.16, 7218.49),
+
+    ["Veil of the Forsaken - MAIN"] = Vector3.new(-4348.36, -11183.62, 7075.06),
+
+    ["Volcanic Vents - MAIN"] = Vector3.new(-3503.68, -2257.55, 3847.52),
+
+    ["Volcanic Vents - ROD"] = Vector3.new(-3198.09, -2039.52, 4038.97),
+
+}
+
+-- 🧭 Alphabetical Sort
+
+local Values = {}
+
+for name, _ in pairs(TeleportLocations) do
+
+    table.insert(Values, name)
+
+end
+
+table.sort(Values, function(a, b)
+
+    if a == "None" then return true end
+
+    if b == "None" then return false end
+
+    return a < b
+
+end)
+
+-- 🌀 Dropdown (Obsidian UI)
+
+TPGroup:AddDropdown("TPNISLANDS", {
+
+    Title = "TELEPORT LOCATION",
+
+    Desc = "SELECT A PLACE TO TELEPORT",
+
+    Values = Values,
+
+    Value = "None",
+
+    Callback = function(selected)
+
+        local player = game.Players.LocalPlayer
+
+        local char = player.Character or player.CharacterAdded:Wait()
+
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        if TeleportLocations[selected] then
+
+            hrp.CFrame = CFrame.new(TeleportLocations[selected])
+
+        end
+
+    end
+
+})
+
+local AutoScyllaEnabled = false
+
+PZGroup:AddToggle("AutoScylla", {
+
+    Text = "Auto Scylla Puzzle",
+
+    Default = false,
+
+    Tooltip = "Automatically completes the Scylla Puzzle",
+
+    Callback = function(state)
+
+        AutoScyllaEnabled = state
+
+        if AutoScyllaEnabled then
+
+            task.spawn(function()
+
+                local Players = game:GetService("Players")
+
+                local LocalPlayer = Players.LocalPlayer
+
+                local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+
+                local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+                local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+                local function TeleportAndWait(pos, waitTime)
+
+                    HumanoidRootPart.CFrame = CFrame.new(pos)
+
+                    task.wait(waitTime)
+
+                end
+
+                local function InteractPrompts()
+
+                    -- Loop through all ProximityPrompts and fire them instantly
+
+                    for _, prompt in pairs(workspace:GetDescendants()) do
+
+                        if prompt:IsA("ProximityPrompt") and prompt.Enabled then
+
+                            prompt:InputHoldBegin()
+
+                            task.wait(0.1)
+
+                            prompt:InputHoldEnd()
+
+                        end
+
+                    end
+
+                end
+
+                -- Step 1: TP to Veil of Forksaken Door 1
+
+                TeleportAndWait(Vector3.new(-4354.93, -11186.15, 7407.52), 70)
+
+                -- Step 2: TP to -4795, -11187, 6597
+
+                TeleportAndWait(Vector3.new(-4795, -11187, 6597), 5)
+
+                InteractPrompts()
+
+                -- Step 3: TP to -4347, -11152, 6485
+
+                TeleportAndWait(Vector3.new(-4347, -11152, 6485), 5)
+
+                InteractPrompts()
+
+                -- Step 4: TP to -4034, -11192, 6493
+
+                TeleportAndWait(Vector3.new(-4034, -11192, 6493), 5)
+
+                InteractPrompts()
+
+                -- Step 5: TP to -4357, -11092, 7138
+
+                TeleportAndWait(Vector3.new(-4357, -11092, 7138), 1)
+
+                
+
+                -- Equip Crossbow bow and interact
+
+                local function EquipAndInteract(itemName)
+
+                    local tool = LocalPlayer.Backpack:FindFirstChild(itemName) or Character:FindFirstChild(itemName)
+
+                    if tool then
+
+                        tool.Parent = Character
+
+                    end
+
+                    task.wait(0.5)
+
+                    InteractPrompts()
+
+                end
+
+                EquipAndInteract("Crossbow bow")
+
+                EquipAndInteract("Crossbow base")
+
+                EquipAndInteract("Crossbow arrow")
+
+                -- Finished
+
+                warn("✅ Auto Scylla Puzzle finished!")
+
+            end)
+
+        end
+
+    end
+
+})
